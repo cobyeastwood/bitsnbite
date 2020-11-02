@@ -1,5 +1,5 @@
 [package]
-name = "bits_n_bite"
+name = "bitsnbite"
 version = "0.1.0"
 authors = ["cobyeast <cobyeastwood@gmail.com>"]
 edition = "2018"
@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 actix-web = "3"
 actix-session = "0.4.0"
+json = "0.12.4"
+serde = "1.0.117"

@@ -11,17 +11,18 @@ use actix_web::http::StatusCode;
 use actix_web::{guard, get, middleware, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use json::JsonValue;
 
-const DIR: &str = "client/build/index.html";
+// const DIR: &str = "client/build/index.html";
 
 async fn index_rust() -> Result<HttpResponse> {
     Ok(HttpResponse::build(StatusCode::OK)
-        .content_type("text/html; text/css; charset=utf-8")
+        .content_type("text/html; charset=utf-8")
         .body(format!("Rust App")))
 }
 
 async fn index_react() -> Result<actix_files::NamedFile> {
-    let text_css: mime::Mime = "text/css".parse().unwrap();
-    Ok(actix_files::NamedFile::set_content_type(actix_files::NamedFile::open("client/build/index.html")?, text_css))
+    // let text_css: mime::Mime = "text/css".parse().unwrap();
+    // Ok(actix_files::NamedFile::set_content_type(actix_files::NamedFile::open("client/build/index.html")?, text_css))
+    Ok(actix_files::NamedFile::open("client/build/index.html")?)
 }
 
 async fn index(item: web::Json<bits::Food>) -> HttpResponse {
@@ -31,26 +32,26 @@ async fn index(item: web::Json<bits::Food>) -> HttpResponse {
 }
 
 // Derive 'get' handler
-#[get("/home")]
-async fn home(session: Session, req: HttpRequest) -> Result<HttpResponse> {
-    println!("Req: {:?}", req);
+// #[get("/home")]
+// async fn home(session: Session, req: HttpRequest) -> Result<HttpResponse> {
+//     println!("Req: {:?}", req);
 
-    let mut counter = 1;
+//     let mut counter = 1;
 
-    match session.get::<i32>("counter")? {
-        Some(count) => {
-            println!("SESSION value: {}", count);
-            counter = count + 1;
-        }
-        None => println!("SESSION value: None"),
-    }
+//     match session.get::<i32>("counter")? {
+//         Some(count) => {
+//             println!("SESSION value: {}", count);
+//             counter = count + 1;
+//         }
+//         None => println!("SESSION value: None"),
+//     }
 
-    session.set("counter", counter)?;
+//     session.set("counter", counter)?;
 
-    Ok(HttpResponse::build(StatusCode::OK)
-        .content_type("text/html; charset=utf-8")
-        .body(include_str!("../statics/home.html")))
-}
+//     Ok(HttpResponse::build(StatusCode::OK)
+//         .content_type("text/html; charset=utf-8")
+//         .body(include_str!("../statics/home.html")))
+// }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -58,9 +59,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .data(web::JsonConfig::default().limit(1024))
+            .service(web::resource("/api/v1/index").route(web::post().to(index)))
             .service(web::resource("/rust").route(web::get().to(index_rust)))
             .service(actix_files::Files::new("/static", "client/build/static"))
-            .service(web::resource("/api/v1/index").route(web::post().to(index)))
             .default_service(
                 web::resource("client/build/index.html")
                     .route(web::get().to(index_react))
